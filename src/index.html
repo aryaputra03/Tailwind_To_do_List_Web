@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List App</title>
+
+     <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+
+    <!--
+      output.css adalah hasil compile Tailwind dari src/input.css.
+      Di-generate otomatis oleh: npm run build  atau  npm run watch.
+      JANGAN edit file ini secara manual.
+    -->
+    <link rel="stylesheet" href="../dist/output.css">
+</head>
+  <!--
+    Catatan dark mode (Tailwind v4):
+    - Class "dark" pada <html> akan ditambahkan / dihapus oleh script.js.
+    - Konfigurasi @variant dark di input.css akan diaktifkan pada Tahap 6.
+  -->
+<body class="min-h-screen bg-slate-100 font-sans dark:bg-slate-900 transition-colors duration-300">
+    <!-- ============================================================
+         HEADER
+         Konten : judul, deskripsi singkat, tombol dark mode
+    ============================================================ -->
+    <header class="top-0 z-10 dark:bg-slate-800/90 bg-white border-b border-slate-200/80 dark:border-slate-700/50 sticky top-0 z-10 backdrop-blur-sm bg-white/90 transition-colors duration-300">
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        
+        <!-- Logo & Judul -->
+        <div class="flex items-center gap-3">
+          <!-- Ikon logo -->
+          <div class="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center shadow-sm shadow-brand-500/30 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <!-- Judul & Deskripsi -->
+          <div>
+            <h1 class="text-base font-extrabold text-slate-800 dark:text-slate-300 leading-none tracking-tight transition-colors duration-300">
+              TodoList
+            </h1>
+            <p class="text-xs text-slate-400 font-medium mt-0.5 hidden sm:block transition-colors duration-300">
+              Catat, kelola, dan pantau tugas harianmu
+            </p>
+          </div>
+        </div>
+ 
+        <!-- Tombol Dark Mode (logika JS ditambahkan Tahap 6) -->
+        <button
+          id="btn-dark-mode"
+          aria-label="Toggle dark mode"
+          class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-500 transition-all duration-200"
+        >
+          <!-- Ikon Moon (light mode) -->
+          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+          </svg>
+          <!-- Ikon Sun (dark mode) — disembunyikan awalnya -->
+          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1m15.07-6.07-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+          </svg>
+        </button>
+ 
+      </div>
+    </header>
+
+    <!-- ============================================================
+         MAIN CONTENT
+    ============================================================ -->
+    <main class="max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col gap-6">
+
+     <!-- ── Hero Greeting ─────────────────────────────────────── -->
+      <div class="text-center pt-1 pb-1">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight leading-tight transition-colors duration-300">
+          Daftar Tugas 📋
+        </h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 transition-colors duration-300">
+          Tambahkan tugas baru, lalu tandai satu per satu saat selesai.
+        </p>
+      </div>
+
+     <!-- --------------------------------------------------------
+           FORM INPUT
+           Konten : input teks tugas baru + tombol tambah
+      -------------------------------------------------------- -->
+      <section aria-label="Tambah tugas baru">
+ 
+        <div class="card p-3 flex gap-2.5">
+ 
+          <!-- Input Teks -->
+          <input
+            id="input-todo"
+            type="text"
+            placeholder="Tambahkan tugas baru..."
+            maxlength="200"
+            autocomplete="off"
+            class="input-base flex-1"
+          />
+ 
+          <!-- Tombol Tambah -->
+          <button
+            id="btn-add-todo"
+            aria-label="Tambah tugas"
+            class="btn-primary shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <span class="hidden xs:inline sm:inline">Tambah</span>
+          </button>
+ 
+        </div>
+ 
+        <!-- Pesan Validasi (ditampilkan JS saat input kosong) -->
+        <div
+          id="msg-validation"
+          role="alert"
+          class="hidden mt-2 ml-1 flex items-center gap-1.5 text-xs text-danger-500 dark:text-red-400 font-medium"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          ⚠️ Tugas tidak boleh kosong!
+        </div>
+ 
+      </section>
+
+      <!-- --------------------------------------------------------
+           SEARCH BAR
+           Konten : input pencarian tugas
+      -------------------------------------------------------- -->
+      <section aria-label="Cari tugas">
+ 
+        <div class="relative">
+          <!-- Ikon Kaca Pembesar -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"
+            />
+          </svg>
+ 
+          <input
+            id="input-search"
+            type="search"
+            placeholder="Cari tugas..."
+            autocomplete="off"
+            class="input-base !pl-14 pr-4 dark:text-slate-600 bg-white shadow-[var(--shadow-card)]"
+          />
+        </div>
+ 
+      </section>
+
+        <!-- --------------------------------------------------------
+           PANEL FILTER
+           Konten : tombol Semua, Aktif, Selesai
+      -------------------------------------------------------- -->
+      <section aria-label="Filter tugas">
+ 
+        <div
+          id="filter-panel"
+          role="tablist"
+          aria-label="Filter status tugas"
+          class="card p-1.5 flex gap-1"
+        >
+ 
+          <!-- Tombol Semua (aktif secara default) -->
+          <button
+            id="filter-all"
+            role="tab"
+            aria-selected="true"
+            data-filter="all"
+            class="btn-filter btn-filter--active"
+          >
+            Semua
+          </button>
+ 
+          <!-- Tombol Aktif -->
+          <button
+            id="filter-active"
+            role="tab"
+            aria-selected="false"
+            data-filter="active"
+            class="btn-filter btn-filter--inactive"
+          >
+            Aktif
+          </button>
+ 
+          <!-- Tombol Selesai -->
+          <button
+            id="filter-completed"
+            role="tab"
+            aria-selected="false"
+            data-filter="completed"
+            class="btn-filter btn-filter--inactive"
+          >
+            Selesai
+          </button>
+        </div>
+      </section>
+
+        <!-- --------------------------------------------------------
+           DAFTAR TODO
+           Setiap item berisi: checkbox, teks tugas, tombol edit & hapus.
+           Item di bawah ini adalah contoh struktur visual Tahap 1.
+           Pada Tahap 4 akan digenerate secara dinamis oleh JavaScript.
+      -------------------------------------------------------- -->
+      <section aria-label="Daftar tugas">
+ 
+        <ul
+          id="todo-list"
+          role="list"
+          aria-label="Daftar semua tugas"
+          class="space-y-2"
+        >
+        </ul>
+ 
+        <!-- Empty State (ditampilkan JS saat daftar kosong) -->
+        <div id="empty-state" class="hidden" aria-live="polite">
+          <div class="card empty-state-card flex flex-col items-center justify-center text-center py-14 sm:py-16 px-6">
+            <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4 text-3xl transition-colors duration-300">
+              📭
+            </div>
+            <p class=" text-slate-700 dark:text-slate-300 text-sm font-bold transition-colors duration-300">
+              Belum ada tugas
+            </p>
+            <p class="text-slate-400 dark:text-slate-500 text-xs mt-1 transition-colors duration-300">
+              Tambahkan tugas di atas
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- --------------------------------------------------------
+           STATISTIK
+           Konten : total tugas, tugas aktif, tugas selesai
+      -------------------------------------------------------- -->
+      <section aria-label="Statistik tugas">
+ 
+        <div class="card p-4">
+ 
+          <h2 class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em] mb-3 transition-colors duration-300">
+            Statistik
+          </h2>
+ 
+          <div class="grid grid-cols-3 gap-2.5">
+ 
+            <!-- Total -->
+            <div class="stat-card flex flex-col items-center justify-center p-4 bg-white dark:bg-slate-700/60 border border-slate-100 dark:border-slate-600/50 shadow-sm transition-colors duration-300">
+              <p id="stat-total" class="text-3xl font-black text-slate-800 dark:text-white leading-none transition-colors duration-300">0</p>
+              <p class="text-[10px] text-slate-400 dark:text-slate-400 mt-2 font-bold uppercase tracking-widest transition-colors duration-300">Total</p>
+            </div>
+ 
+            <!-- Aktif -->
+            <div class="stat-card bg-brand-50 dark:bg-indigo-900/30 border border-brand-100 dark:border-indigo-800/40 transition-colors duration-300">
+              <p id="stat-active" class="text-2xl font-extrabold text-brand-500 leading-none">1</p>
+              <p class="text-[11px] text-brand-500 dark:text-indigo-400 mt-1.5 font-semibold uppercase tracking-wide transition-colors duration-300">Aktif</p>
+            </div>
+ 
+            <!-- Selesai -->
+            <div class="stat-card bg-success-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800/40 transition-colors duration-300">
+              <p id="stat-completed" class="text-2xl font-extrabold text-success-500 leading-none">1</p>
+              <p class="text-[11px] text-success-400 dark:text-emerald-400 mt-1.5 font-semibold uppercase tracking-wide transition-colors duration-300">Selesai</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============================================================
+         MODAL KONFIRMASI HAPUS
+         Logika JS ditambahkan pada Tahap 4
+    ============================================================ -->
+    <div
+      id="modal-confirm-delete"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0"
+    >
+      <!-- Backdrop -->
+      <div id="modal-backdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+ 
+      <!-- Panel Modal -->
+      <div class="relative w-full sm:max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden transition-colors duration-300" style="animation: fadeUp 0.2s ease forwards;">
+        <div class="h-1 w-full bg-gradient-to-r from-danger-500 to-rose-400"></div>
+        <div class="p-5">
+          <h3 id="modal-title" class="text-base font-bold text-slate-800 dark:text-white mb-1 transition-colors duration-300">
+          Hapus Tugas?
+          </h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-5 leading-relaxed transition-colors duration-300">
+            Tindakan ini tidak dapat dibatalkan. Yakin ingin menghapus tugas ini?
+          </p>
+          <div class="flex gap-2.5">
+            <button
+              id="btn-cancel-delete"
+              class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-150"
+            >
+              Batal
+            </button>
+            <button
+              id="btn-confirm-delete"
+              class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-danger-500 hover:bg-danger-600 transition-colors duration-150"
+            >
+              Ya, Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         FOOTER
+    ============================================================ -->
+    <footer class="text-center py-8 text-xs text-slate-400 dark:text-slate-600 transition-colors duration-300">
+      Todo List App &mdash; HTML + Tailwind CSS v4 (NPM) + Vanilla JS
+    </footer>
+ 
+ 
+    <script src="./script.js"></script>
+</body>
+</html>
